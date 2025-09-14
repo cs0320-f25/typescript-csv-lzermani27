@@ -1,0 +1,24 @@
+1) Correctness
+
+A CSV parser is “correct” if it always turns the text into the same rows and columns you’d expect from looking at the file.
+Commas split columns only when they're not inside quotes. If a value is "New York, NY", it stays in one column. If a value is 
+quoted and you see two quotes in a row (""), that becomes a single " in the final value. Newlines inside quotes belong to the value and do not 
+start a new row. A row ends only at a newline that is not inside quotes. The last row should still be returned even if the file doesn’t end 
+with a newline. If there is a header row, every row after it should produce the same number of columns as the header. Files that use \n or \r\n 
+line breaks should parse the same way (no stray \r left in values). If the file is broken (like an opening quote with no closing quote), the 
+parser should either stop with a clear error or handle it in a consistent way.
+
+2) Random, on-demand generation
+
+If you have a function that can make random CSVs, you can use it to make your tests better. Generate lots of random tables with 
+different sizes, and randomly decide which cells are quoted, which include commas, quotes, or newlines. For each random file, check simple
+rules: every row has the same number of columns as the header; commas inside quotes don’t split; quotes show up correctly; newlines inside 
+quotes don’t create extra rows. 
+
+3) Overall experience, bugs, and fixes
+
+This sprint felt less like “split on commas” and more like carefully reading text so you don’t break values that contain commas or newlines. 
+The biggest surprise was how often quotes change what counts as a column or a row. I first tried a simple split and ran into problems when 
+commas or newlines were inside quotes, so I switched to reading the file character by character and keeping track of whether I was currently 
+“inside quotes.” That fixed most of it. Overall, thinking in terms of “what rules should always hold” made the parser sturdier and the tests 
+clearer.
